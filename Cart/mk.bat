@@ -1,4 +1,4 @@
-..\..\Millfork\millfork.exe -o Game -g -t aquarius_crt -Os Main.mfk
+..\Tools\Millfork\millfork.exe -o Game -g -t aquarius_crt -Os Main.mfk
 IF ERRORLEVEL 1 goto errorOut
 
 echo Build completed successfully

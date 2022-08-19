@@ -1,4 +1,4 @@
-..\..\Millfork\millfork.exe -o Cassette\Game -g -t aquarius_tape -Os Main.mfk
+..\Tools\Millfork\millfork.exe -o Cassette\Game -g -t aquarius_tape -Os Main.mfk
 IF ERRORLEVEL 1 goto errorOut
 
 ..\Tools\WriteCAQ 16384 16384 16368 Cassette\Game.bin Cassette\Game_A.CAQ GAME
