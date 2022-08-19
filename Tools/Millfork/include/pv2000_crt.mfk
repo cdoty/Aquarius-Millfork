@@ -1,0 +1,61 @@
+const word RAMStart		= $7000
+const word RAMSize		= $3EE
+const word StackStart	= $C3F0
+const byte PSGPort		= $7F
+
+void start()@$c000
+{
+	asm
+	{
+		jp	_start
+	}
+}
+
+void _start()
+{
+	_clearRam();			// Clear ram
+	_delay();				// Delay the start
+	_setupNMIInterrupt();	// Setup NMI interrupt
+	
+	main();
+}
+
+asm void _clearRam()
+{
+	xor		a
+		
+	ld		hl, RAMStart
+	ld		(hl), a
+	
+	ld		de, RAMStart + 1
+	ld		bc,	RAMSize - 1
+	
+	ldir
+
+	ret
+}
+
+macro asm void _delay()
+{
+	ld	bc, 0
+	
+_delayLoop:
+	dec	bc
+	
+	ld	a, b
+	or	c
+	
+	jr	nz, _delayLoop
+}
+
+macro asm void _setupNMIInterrupt()
+{
+	ld		a, $C3
+	ld		hl, nmiHandler
+	
+	ld		(NMIAddress), a
+	ld		a, l
+	ld		(NMIAddress + 1), a
+	ld		a, h
+	ld		(NMIAddress + 2), a
+}

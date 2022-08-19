@@ -1,0 +1,26 @@
+import Aliens
+import Background
+import Bullets
+import Defines
+import Player
+import Routines
+
+void startGame()
+{
+	initializeInput();
+	clearSprites();
+
+	clearBullets();
+	loadBackground(BackgroundScreen, BackgroundColor);
+	setupPlayer();
+	setupAliens();
+
+	while (true)
+	{
+		waitVBlank();
+
+		updatePlayer();
+		updateAliens();
+		updateBullets();
+	}
+}

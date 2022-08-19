@@ -1,0 +1,7 @@
+macro void loadBackground(pointer _screenData, pointer _colorData)
+{
+//	decompressToRAM(_screenData.addr, ScreenRam);
+//	decompressToRAM(_colorData.addr, ColorRam);
+	transferToScreen(_screenData.addr, ScreenSize);
+	transferToColor(_colorData.addr, ScreenSize);
+}

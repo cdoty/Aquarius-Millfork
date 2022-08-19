@@ -1,0 +1,8 @@
+#if not(PV2000)
+#warn pv2000_hardware module should be only used on PV-2000 targets
+#endif
+
+const pointer VDPBase		= $4000;	// VDP base
+const pointer VDPReadBase	= $4000;	// VDP read base
+const pointer NMIAddress	= $7498;	// NMI address
+const pointer INTAddress	= $749B;	// INT address

@@ -1,0 +1,116 @@
+struct Sprite {
+	unsigned16	offset,			// Offset
+	ubyte		x,				// Position
+	ubyte		y,
+	ubyte		char,			// Char
+	ubyte		color,			// Color
+	ubyte		charBackup,		// Backup of current char
+	ubyte		colorBackup		// Backup of current color
+	bool		active;			// Is the sprite active
+}
+
+const ubyte	g_maxSprites	= 16;
+
+array(Sprite)	g_sprites[g_maxSprites];
+
+ubyte addSprite()
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxSprites
+	{
+		if (false == g_sprites[iLoop].active)
+		{
+			g_sprites[iLoop].active	= true;
+			
+			return	iLoop;
+		}
+	}
+
+	return	$FF
+}
+
+inline void clearSprites()
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxSprites
+	{
+		g_sprites[iLoop].active	= false;
+	}
+}
+
+void setSpriteOffset(ubyte _spriteID, ubyte _x, ubyte _y)
+{
+	g_sprites[_spriteID].x		= _x;
+	g_sprites[_spriteID].y		= _y;
+	g_sprites[_spriteID].offset	= (word(_y) << 5) + (word(_y) << 3) + _x;	// Mulitple y by 40 (32 + 8)
+}
+
+inline void setSpriteChar(ubyte _spriteID, ubyte _char)
+{
+	g_sprites[_spriteID].char	= _char;
+}
+
+inline void setSpriteColor(ubyte _spriteID, ubyte _color)
+{
+	g_sprites[_spriteID].color	= _color;
+}
+
+void drawSprite(ubyte _spriteID)
+{
+	unsigned16	offset;
+	
+	offset	= g_sprites[_spriteID].offset;
+
+	g_sprites[_spriteID].charBackup		= ScreenRam[offset];
+	g_sprites[_spriteID].colorBackup	= ColorRam[offset];
+
+	ScreenRam[offset]	= g_sprites[_spriteID].char;
+	ColorRam[offset]	= g_sprites[_spriteID].color;
+}
+
+void moveSprite(ubyte _spriteID, ubyte _x, ubyte _y)
+{
+	eraseSprite(_spriteID);
+
+	setSpriteOffset(_spriteID, _x, _y);
+
+	drawSprite(_spriteID);
+}
+
+void eraseSprite(ubyte _spriteID)
+{
+	unsigned16	offset;
+	
+	offset	= g_sprites[_spriteID].offset;
+
+	ScreenRam[offset]	= g_sprites[_spriteID].charBackup;
+	ColorRam[offset]	= g_sprites[_spriteID].colorBackup;
+}
+
+void moveSpriteX(ubyte _spriteID, ubyte _x)
+{
+	if (_x != g_sprites[_spriteID].x)
+	{
+		moveSprite(_spriteID, _x, g_sprites[_spriteID].y);
+	}
+}
+
+void moveSpriteY(ubyte _spriteID, ubyte _y)
+{
+	if (_y != g_sprites[_spriteID].y)
+	{
+		moveSprite(_spriteID, g_sprites[_spriteID].x, _y);
+	}
+}
+
+inline ubyte getSpriteX(ubyte _spriteID)
+{
+	return	g_sprites[_spriteID].x;
+}
+
+inline ubyte getSpriteY(ubyte _spriteID)
+{
+	return	g_sprites[_spriteID].y;
+}

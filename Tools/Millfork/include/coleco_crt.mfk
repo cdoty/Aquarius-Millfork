@@ -1,0 +1,46 @@
+const array _header @ $8000 = [
+#if defined(DISABLE_COLECO_LOGO) && DISABLE_COLECO_LOGO==1
+	@word [$AA55],			// Don't show title page
+#else
+	@word [$55AA],			// Show title page
+#endif
+
+    @word [$6000],			// Sprite buffer
+    @word [$6080],			// Sprite order table
+    @word [$60A0],			// Sprite work buffer
+	
+    0,						// Disable joystick 1 polling
+	0,						// Disable joystick 2 polling
+    @word [_start.addr],	// Start address
+
+	$ed, $4d, $00,			// RST8h Handler
+	$ed, $4d, $00,			// RST10h Handler
+	$ed, $4d, $00,			// RST18h Handler
+	$ed, $4d, $00,			// RST20h Handler
+	$ed, $4d, $00,			// RST28h Handler
+	$ed, $4d, $00,			// RST30h Handler
+	$c3, 					// IRQ Handler (jp _irq)
+	@word [_irq.addr],
+	$c3,					// NMI handler (jp _nmi)
+	@word [_nmi.addr]
+]
+
+interrupt void _irq()
+{
+	irqHandler();
+}
+
+interrupt void _nmi()
+{
+	nmiHandler();
+}
+
+void _start()
+{
+	asm
+	{
+		call	$1FD6	; Disable sound
+	}
+
+	main();
+}

@@ -1,0 +1,81 @@
+#if defined(CART_8K_2K) && CART_8K_2K==1
+const array _header @ $2000 = [		// 0 =  8 KB from $2000  1 =  8 KB from $4000  2 = 16 KB from $2000
+	0,
+#elseif defined(CART_8K_4K) && CART_8K_4K==1
+const array _header @ $4000 = [
+	1,
+#else
+const array _header @ $2000 = [
+	2,
+#endif
+    @word [_start.addr],	// Start address
+    @word [_runOnce.addr],	// Code ran on initial cartridge load
+    @word [_unknown.addr]	// Unknown entry
+]
+
+const word RAMStart		= $7300
+const word RAMSize		= $0CFC
+const word StackStart	= $7FFF
+
+void _start()
+{
+	asm
+	{
+		di
+		
+		ld	a, 1				; Set Z80CTC channel 1 to control mode
+		out (1), a
+		
+		ld	sp, StackStart		; Setup stack pointer
+	}
+	
+	_clearRam();			// Clear ram
+	_delay();				// Delay the start
+	_setupNMIInterrupt();	// Setup NMI interrupt
+
+	main();
+}
+
+asm void _runOnce()
+{
+	ret;
+}
+
+asm void _unknown()
+{
+	ret;
+}
+
+asm void _clearRam()
+{
+	xor	a
+		
+	ld	hl, RAMStart
+	ld	(hl), a
+	
+	ld	de, RAMStart + 1
+	ld	bc,	RAMSize - 1
+	
+	ldir
+
+	ret
+}
+
+macro asm void _delay()
+{
+	ld	bc, 0
+	
+_delayLoop:
+	dec	bc
+	
+	ld	a, b
+	or	c
+	
+	jr	nz, _delayLoop
+}
+
+macro asm void _setupNMIInterrupt()
+{
+	ld	hl, nmiHandler.addr	; Load VBI handler address
+	ld	(VBIAddress), hl	; Store in Z80CTC channel 3 interrupt address.
+}

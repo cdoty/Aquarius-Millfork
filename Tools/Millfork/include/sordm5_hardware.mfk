@@ -1,0 +1,8 @@
+#if not(SORDM5)
+#warn sordm5_hardware module should be only used on Sord M5 targets
+#endif
+
+const byte 		VDPBase		= $10;		// VDP base	
+const byte 		VDPReadBase	= $10;		// VDP read base
+const pointer	VBIAddress	= $7006;	// VBI address
+const pointer	PalNTSC		= $1518;	// Pal/NTSC detection address

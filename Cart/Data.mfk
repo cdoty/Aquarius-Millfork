@@ -1,0 +1,6 @@
+//const array BackgroundScreen	= file("../Graphics/Compressed/Background.scn.pck");
+//const array BackgroundColor		= file("../Graphics/Compressed/Background.col.pck");
+const array BackgroundScreen	= file("../Graphics/Background.scn");
+const array BackgroundColor		= file("../Graphics/Background.col");
+const array	SpriteChars			= file("../Sprites/Sprites.chr");
+const array	SpriteColors		= file("../Sprites/Sprites.col");

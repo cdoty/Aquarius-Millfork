@@ -1,0 +1,24 @@
+#if (TAPE)
+	void start() @ $4000
+	{
+		main();
+
+		asm
+		{
+	loop:
+			jp	loop
+		}
+	}
+#else
+	const array _header @ $E000 =
+	[
+		// Created from https://www.vdsteenoven.com/aquarius/romcheck.html
+		// Sets the rom as unscrambled.
+		82, 65, 83, 84,	82, 156, 83, 176, 79, 108, 70, 100, 84, 168, 124, 112
+	]
+
+	void start() @ $E010
+	{
+		main();
+	}
+#endif

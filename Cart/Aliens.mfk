@@ -1,0 +1,131 @@
+import Data
+import Routines
+
+const ubyte	g_alienWidth	= 3;
+const ubyte	g_alienHeight	= 3;
+const ubyte	g_maxAliens		= 6;
+const ubyte	g_invalidAlien	= $40;
+
+struct Alien {
+	unsigned16	screenOffset,	// Screen offset
+	unsigned16	dataOffset;		// Data offset
+	ubyte		x,				// Position
+	ubyte		y,
+	ubyte		frames;			// Animation frames
+	ubyte		type;			// Alien type. Also used to find empty alien slots.
+}
+
+array(Alien)	g_aliens[g_maxAliens];
+ubyte			g_aliensActive;
+
+inline void setupAliens()
+{
+	clearAliens();
+}
+
+inline void clearAliens()
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxAliens
+	{
+		g_aliens[iLoop].type	= g_invalidAlien;
+	}
+
+	g_aliensActive	= 0;
+}
+
+inline void updateAliens()
+{
+	if (g_aliensActive < g_maxAliens)
+	{
+		addAlien();
+	}
+}
+
+void addAlien()
+{
+	ubyte	iLoop;
+	ubyte	x;
+	ubyte	y;
+	ubyte	value;
+
+	for iLoop, 0, until, g_maxAliens
+	{
+		if (g_invalidAlien == g_aliens[iLoop].type)
+		{
+			g_aliensActive	= g_aliensActive + 1;
+
+			x	= (iLoop << 2) + (iLoop << 1) + 4;
+			y	= g_topY;
+
+			g_aliens[iLoop].x				= x;
+			g_aliens[iLoop].y				= y;
+			g_aliens[iLoop].screenOffset	= (word(y) << 5) + (word(y) << 3) + x;	// Mulitple y by 40 (32 + 8)
+						
+			value	= getRandomIndex(32);
+
+			g_aliens[iLoop].type	= value;
+
+			if (value < 3)
+			{
+				g_aliens[iLoop].frames	= 2;
+			}
+
+			else
+			{
+				g_aliens[iLoop].frames	= 3;
+			}
+
+			// Data offset is multiplied by two to skip second frame
+			g_aliens[iLoop].dataOffset	=  ((unsigned16(g_aliens[iLoop].type) << 3) + g_aliens[iLoop].type) << 1;
+			
+			drawAlien(iLoop);
+
+			break;
+		}
+	}
+}
+
+void removeAlien(ubyte _alienID)
+{
+	if (g_aliens[_alienID].type != g_invalidAlien)
+	{
+		g_aliens[_alienID].type	= g_invalidAlien;
+
+		g_aliensActive	= g_aliensActive - 1;
+	}
+}
+
+void drawAlien(ubyte _alienID)
+{
+		ubyte		x;
+		ubyte		y;
+		ubyte		nextLineOffset;
+		ubyte 		character;
+		unsigned16	dataOffset;
+		unsigned16	screenOffset;
+
+		dataOffset		= g_aliens[_alienID].dataOffset;
+		screenOffset	= g_aliens[_alienID].screenOffset;
+		nextLineOffset	= ScreenCharWidth - g_alienWidth;
+
+		for y, 0, until, g_alienWidth
+		{
+			for x, 0, until, g_alienHeight
+			{
+				character	= SpriteChars[dataOffset];
+
+				if (character != 32)
+				{
+					ScreenRam[screenOffset]	= character;
+					ColorRam[screenOffset]	= SpriteColors[dataOffset];
+				}
+
+				dataOffset		= dataOffset + 1;
+				screenOffset	= screenOffset + 1;
+			}
+
+			screenOffset	= screenOffset + nextLineOffset;
+		}
+}

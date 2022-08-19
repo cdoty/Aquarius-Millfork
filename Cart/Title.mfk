@@ -1,0 +1,17 @@
+import random
+import Routines
+
+void showTitle()
+{
+	while (true)
+	{
+		waitVBlank();
+
+		// Update random seed on each frame update
+		rand_seed.lo	= rand_seed.lo + 1;
+		rand_seed.hi	= rand_seed.hi + 1;
+
+		// Remove once title screen is in place
+		break;
+	}
+}

@@ -1,0 +1,6 @@
+#if not(SVI)
+#warn svi_hardware module should be only used on SpectraVideo targets
+#endif
+
+const byte VDPBase		= $80;	// VDP base	
+const byte VDPReadBase	= $84;	// VDP read base

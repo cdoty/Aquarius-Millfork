@@ -1,0 +1,12 @@
+#if not(AQUARIUS)
+#warn aquarius_hardware module should be only used on Aquarius targets
+#endif
+
+const pointer	ScreenRam			= $3000;		// Screen Ram location
+const pointer	ColorRam			= $3400;		// Color Ram location
+const byte		PSGData				= $F6;			// PSG data
+const byte		PSGRegister			= $F7;			// PSG register
+const byte		VBlankStatus		= $FD;			// VBlank status
+const byte		ScreenCharWidth		= 40;			// Screen width, in characters
+const byte		ScreenCharHeight	= 25;			// Screen height, in characters
+const word		ScreenSize			= word(40) * word(25);	// Screen size

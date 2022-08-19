@@ -1,0 +1,2 @@
+const pointer	RAMStart	= $3900
+const word 		RAMSize		= $7F0

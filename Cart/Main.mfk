@@ -1,0 +1,18 @@
+import random
+
+import Game
+import Startup
+import Title
+import random
+
+void main()
+{
+	// Set the initial random number seed
+	rand_seed	= $0720;
+
+	while (true)
+	{
+		showTitle();
+		startGame();
+	}
+}

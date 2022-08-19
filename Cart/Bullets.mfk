@@ -1,0 +1,72 @@
+import Sprite
+
+const ubyte	g_maxBullets	= 4;
+const ubyte	g_bulletChar	= 198;
+const ubyte	g_bulletColor	= $24;
+const ubyte	g_topY			= 4;
+
+struct Bullet {
+	ubyte	spriteID;	// Sprite ID
+	ubyte	positionY;	// Position
+	bool	active;		// Active?
+}
+
+array(Bullet)	g_bullets[g_maxBullets];
+
+inline void clearBullets()
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxBullets
+	{
+		g_bullets[iLoop].active		= false;
+		g_bullets[iLoop].spriteID	= addSprite();
+	}
+}
+
+inline void addBullet(ubyte _x, ubyte _y)
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxBullets
+	{
+		if (false == g_bullets[iLoop].active)
+		{
+			g_bullets[iLoop].active		= true;
+			g_bullets[iLoop].positionY	= _y << 2;
+
+			setSpriteOffset(g_bullets[iLoop].spriteID, _x, _y);
+			setSpriteChar(g_bullets[iLoop].spriteID, g_bulletChar);
+			setSpriteColor(g_bullets[iLoop].spriteID, g_bulletColor);
+			
+			drawSprite(g_bullets[iLoop].spriteID);
+
+			break;
+		}
+	}
+}
+
+inline void updateBullets()
+{
+	ubyte	iLoop;
+
+	for iLoop, 0, until, g_maxBullets
+	{
+		if (true == g_bullets[iLoop].active)
+		{
+			g_bullets[iLoop].positionY	= g_bullets[iLoop].positionY - 1;
+
+			if (g_bullets[iLoop].positionY < (g_topY * 4))
+			{
+				g_bullets[iLoop].active	= false;
+
+				eraseSprite(g_bullets[iLoop].spriteID);
+			}
+			
+			else
+			{
+				moveSpriteY(g_bullets[iLoop].spriteID, g_bullets[iLoop].positionY >> 2);
+			}
+		}
+	}
+}

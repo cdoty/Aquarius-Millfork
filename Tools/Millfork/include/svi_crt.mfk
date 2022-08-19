@@ -1,0 +1,56 @@
+const word RAMStart		= $C000
+const word RAMSize		= $3FFE
+const word StackStart	= $0000
+
+void start()@$00
+{
+	asm
+	{
+		di	
+
+		ld	sp, StackStart	; Set stack pointer
+	}
+	
+	_clearRam();	// Clear ram
+	_delay();		// Delay the start
+
+	main();
+}
+
+interrupt void _irq()@$38
+{
+	irqHandler();
+
+	asm
+	{
+		ei
+	}
+}
+
+asm void _clearRam()
+{
+	xor		a
+		
+	ld		hl, RAMStart
+	ld		(hl), a
+	
+	ld		de, RAMStart + 1
+	ld		bc,	RAMSize - 1
+	
+	ldir
+
+	ret
+}
+
+macro asm void _delay()
+{
+	ld	bc, 0
+	
+_delayLoop:
+	dec	bc
+	
+	ld	a, b
+	or	c
+	
+	jr	nz, _delayLoop
+}

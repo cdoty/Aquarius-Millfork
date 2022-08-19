@@ -1,0 +1,80 @@
+const word RAMStart		= $C000
+const word RAMSize		= $3EE
+const word StackStart	= $C3F0
+const byte PSGPort		= $7F
+
+void start()@$00
+{
+	asm
+	{
+		di	
+		im	1
+
+		ld	sp, StackStart	; Set stack pointer
+	}
+	
+	_resetSound();	// Reset sound to stop noise at startup
+	_delay();		// Delay before starting
+	_clearRam();		// Clear ram
+	
+	main();
+}
+
+interrupt void _irq()@$38
+{
+	irqHandler();
+
+	asm
+	{
+		ei
+	}
+
+}
+
+interrupt void _nmi()@$66
+{
+	nmiHandler();
+}
+
+macro asm void _resetSound()
+{
+	ld	a, $9F			; Set volumes to zero
+	out	(PSGPort), a
+	
+	ld	a, $BF
+	out	(PSGPort), a
+	
+	ld	a, $DF
+	out	(PSGPort), a
+	
+	ld	a, $FF
+	out	(PSGPort), a
+}
+
+macro asm void _delay()
+{
+	ld	bc, 0
+	
+_delayLoop:
+	dec	bc
+	
+	ld	a, b
+	or	c
+	
+	jr	nz, _delayLoop
+}
+
+asm void _clearRam()
+{
+	xor		a
+		
+	ld		hl, RAMStart
+	ld		(hl), a
+	
+	ld		de, RAMStart + 1
+	ld		bc,	RAMSize - 1
+	
+	ldir
+
+	ret
+}

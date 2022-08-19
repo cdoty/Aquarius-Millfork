@@ -1,0 +1,160 @@
+import aquarius_hardware
+import Data
+
+enum JoystickInput	{
+	JoystickLeft	= 0x01,
+	JoystickRight	= 0x02,
+	JoystickUp		= 0x04,
+	JoystickDown	= 0x08,
+	JoystickButton1	= 0x10,
+	JoystickButton2	= 0x20,
+	JoystickButton3	= 0x40,
+	JoystickButton4	= 0x80
+}
+
+ubyte	g_joystickRaw;
+ubyte	g_joystickValue;
+ubyte	g_joystickLastValue;
+
+void initializeInput()
+{
+	g_joystickValue		= 0;
+	g_joystickLastValue	= 0;
+}
+
+void transferToScreen(pointer _srcAddress, word _size)
+{
+	asm
+	{
+		ld	hl, (_srcAddress)
+		ld	de, $3000
+		ld	bc, (_size)
+
+		ldir
+	}
+}
+
+void transferToColor(pointer _srcAddress, word _size)
+{
+	asm
+	{
+		ld	hl, (_srcAddress)
+		ld	de, $3400
+		ld	bc, (_size)
+
+		ldir
+	}
+}
+
+asm void waitVBlank()
+{
+waitForClear:
+	in	a, (VBlankStatus)
+	bit	0, a
+	jr	nz, waitForClear
+
+waitForSet:
+	in	a, (VBlankStatus)
+	bit	0, a
+	jr	z, waitForSet
+
+	ret
+}
+
+asm void readJoystick1()
+{
+	ld	a, 7				; Select register 7
+	out	(PSGRegister), a
+	
+	in	a, (PSGData)		; Enable port A and B input ports
+	and	$3F
+	
+	out	(PSGData), a
+
+	ld	a, 14				; Set register 14. Note: Mame has the ports backwards.
+	out	(PSGRegister), a
+
+	in	a, (PSGData)		; Read value 
+
+	ld	(g_joystickRaw), a
+
+	ret
+}
+
+asm void readJoystick2()
+{
+	ld	a, 7				; Select register 7
+	out	(PSGRegister), a
+	
+	in	a, (PSGData)		; Enable port A and B input ports
+	and	$3F
+	
+	out	(PSGData), a
+
+	ld	a, 15				; Set register 15. Note: Mame has the ports backwards.
+	out	(PSGRegister), a
+
+	in	a, (PSGData)		; Read value 
+
+	ld	(g_joystickRaw), a
+
+	ret
+}
+
+void decodeJoytick()
+{
+	g_joystickLastValue	= g_joystickValue;
+	g_joystickValue		= 0;
+
+	// Check to see if bits are cleared for direction and n
+	if (0 == (g_joystickRaw & $08))
+	{
+		g_joystickValue	|= ubyte(JoystickLeft);
+	}
+
+	else if (0 == (g_joystickRaw & $02))
+	{
+		g_joystickValue	|= ubyte(JoystickRight);
+	}
+
+	if (0 == (g_joystickRaw & $04))
+	{
+		g_joystickValue	|= ubyte(JoystickUp);
+	}
+
+	if (0 == (g_joystickRaw & $01))
+	{
+		g_joystickValue	|= ubyte(JoystickDown);
+	}
+
+	if (0 == (g_joystickRaw & $40))
+	{
+		g_joystickValue	|= ubyte(JoystickButton1);
+	}
+}
+
+// Gets a random index based on slicing 128 into _value slices.
+ubyte getRandomIndex(ubyte _value)
+{
+	ubyte	random;
+	ubyte	currentValue;
+	ubyte	index;
+
+	currentValue	= _value;
+	index			= 0;
+	random			= rand() & $7F;
+
+	for currentValue, _value, until, 128
+	{
+		if (random < currentValue)
+		{
+			return	index;
+		}
+		
+		currentValue	= currentValue + _value;
+
+		index	= index + 1;
+	}
+
+	return	index;
+}

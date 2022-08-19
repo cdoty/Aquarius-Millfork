@@ -1,0 +1,6 @@
+#if not(SG1000)
+#warn sg1000_hardware module should be only used on SG-1000 targets
+#endif
+
+const byte VDPBase		= $BE;	// VDP base
+const byte VDPReadBase	= $BE;	// VDP read base

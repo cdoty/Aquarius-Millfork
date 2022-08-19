@@ -1,0 +1,6 @@
+#if not(COLECO)
+#warn coleco_hardware module should be only used on Coleco targets
+#endif
+
+const byte VDPBase		= $BE;	// VDP base
+const byte VDPReadBase	= $BE;	// VDP read base

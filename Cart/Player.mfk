@@ -1,0 +1,60 @@
+import Bullets
+import Sprite
+
+const ubyte	g_playerChar	= 25;
+const ubyte	g_playerColor	= $74;
+
+struct Player {
+	ubyte	spriteID;
+	ubyte	positionX;
+}
+
+Player	g_player;
+
+inline void setupPlayer()
+{
+	const ubyte	x	= ScreenCharWidth / 2;
+
+	g_player.spriteID		= addSprite();
+
+	setSpriteOffset(g_player.spriteID, x, ScreenCharHeight - 3);
+	setSpriteChar(g_player.spriteID, g_playerChar);
+	setSpriteColor(g_player.spriteID, g_playerColor);
+
+	drawSprite(g_player.spriteID);
+
+	g_player.positionX	= x << 2;
+}
+
+inline void updatePlayer()
+{
+	readJoystick1();	
+	decodeJoytick();
+
+	if ((g_joystickValue & ubyte(JoystickRight)) != 0)
+	{
+		if (g_player.positionX < (ScreenCharWidth * 4 - 1))
+		{
+			g_player.positionX	= g_player.positionX + 1;
+		}
+	}
+
+	else if ((g_joystickValue & ubyte(JoystickLeft)) != 0)
+	{
+		if (g_player.positionX > 0)
+		{
+			g_player.positionX	= g_player.positionX - 1;
+		}
+	}
+
+	ubyte	spriteID;
+
+	spriteID	= g_player.spriteID;
+
+	moveSpriteX(spriteID, g_player.positionX >> 2);
+
+	if ((g_joystickValue & ubyte(JoystickButton1)) != 0 && 0 == (g_joystickLastValue & ubyte(JoystickButton1)))
+	{
+		addBullet(getSpriteX(spriteID), getSpriteY(spriteID) - 1);
+	}
+}

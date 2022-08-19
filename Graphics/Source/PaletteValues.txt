@@ -1,0 +1,18 @@
+0 Black: 2 2 2
+1 Red: 27 2 5
+2 Green: 2 24 0
+3 Yellow: 26 23 2
+4 Blue: 1 3 24
+5 Magenta: 25 2 27
+6 Cyan: 0 25 21
+7 White: 31 31 31
+
+Low intensity:
+8 White: 24 24 24
+9 Cyan: 9 21 19
+10 Magenta: 18 7 19
+11 Blue: 3 4 15
+12 Yellow: 24 23 12
+13 Green: 8 20 7
+14 Red: 18 5 7
+15 Black: 2 2 2
